@@ -51,6 +51,7 @@ public class WebSocketEventListener {
 			ChatMessage chatMessage = new ChatMessage();
 			chatMessage.setType(ChatMessage.MessageType.LEAVE);
 			chatMessage.setSender(username);
+
 			simpMessagingTemplate.convertAndSendToUser(roomid, "/message", chatMessage);
 
 		}

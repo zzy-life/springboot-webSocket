@@ -10,7 +10,7 @@ public class ChatMessage {
 	private Integer roomId;
 
 	public enum MessageType {
-		CHAT, JOIN, LEAVE
+		CHAT, JOIN, LEAVE, ERROR
 	}
 
 	public MessageType getType() {
