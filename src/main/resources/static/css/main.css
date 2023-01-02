@@ -276,11 +276,11 @@ button.accent {
 }
 
 .connecting {
-    padding-top: 5px;
+    
     text-align: center;
     color: #777;
     position: absolute;
-    top: 65px;
+    top: 95px;
     width: 100%;
 }
 
@@ -307,7 +307,7 @@ button.accent {
     }
 
     #chat-page ul {
-        height: calc(100% - 120px);
+        height: calc(100% - 160px);
     }
 
     #messageForm .input-group button {
@@ -323,7 +323,7 @@ button.accent {
     }
 
     .connecting {
-        top: 60px;
+        top: 77px;
     }
 
     .chat-header h2 {

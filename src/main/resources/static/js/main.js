@@ -29,9 +29,31 @@ function connect(event) {
         usernamePage.classList.add('hidden');
         chatPage.classList.remove('hidden');
         if (stompClient == null) {
-            var socket = new SockJS('/ws');
-            stompClient = Stomp.over(socket);
 
+            /* 使用SockJS部署到服务器时，需要走nginx代理才可连接，否则无法连接
+            #websocket配置
+            # location /{
+            #     proxy_set_header Host $http_host;
+            #     proxy_set_header X-Real-IP $remote_addr;
+            #     proxy_set_header REMOTE-HOST $remote_addr;
+            #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            #     proxy_pass http://localhost:8080;
+            # }
+            #   location /ws{
+            #     proxy_http_version 1.1;
+            #     proxy_set_header Upgrade $http_upgrade;
+            #     proxy_set_header Connection "Upgrade";
+            #     proxy_set_header Host $host;
+            #             proxy_pass http://localhost:8080/ws;
+            # }
+            */
+
+            //var socket = new SockJS('/ws');
+            var host = location.host;
+            var socket = new WebSocket('ws://' + host + '/ws');
+            stompClient = Stomp.over(socket);
+            stompClient.heartbeat.outgoing = 20000; // client will send heartbeats every 20000ms
+            stompClient.heartbeat.incoming = 0;     // client does not want to receive heartbeats
             stompClient.connect({}, onConnected, onError);
         }
 
@@ -58,7 +80,7 @@ function onConnected() {
 
 
 function onError(error) {
-    connectingElement.textContent = 'Could not connect to WebSocket server. Please refresh this page to try again!';
+    connectingElement.textContent = '无法连接到 WebSocket 服务器。 请刷新此页面重试!';
     connectingElement.style.color = 'red';
 }
 
@@ -88,7 +110,8 @@ function onMessageReceived(payload) {
         alert('账号重复,请重新输入账号');
         chatPage.classList.add('hidden');
         usernamePage.classList.remove('hidden');
-    
+        stompClient.disconnect()
+        stompClient = null
     }
     //错误消息另外处理，不进行聊天处理
     if (message.type === 'ERROR') {
@@ -110,7 +133,7 @@ function onMessageReceived(payload) {
     } else if (message.type === 'LEAVE') {
         messageElement.classList.add('event-message');
         message.content = message.sender + ' 退出房间!';
-    } 
+    }
     else {
         if (message.sender == username) {
             messageElement.classList.add('chat-message-right');

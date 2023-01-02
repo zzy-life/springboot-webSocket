@@ -90,7 +90,6 @@ public class ChatController {
 		}
 		// Add username in web socket session
 		System.out.println("用户名:" + chatMessage.getSender());
-
 		System.out.println("SessionId:" + headerAccessor.getSessionId());
 
 		handlePrivateDouser(chatMessage, headerAccessor);
@@ -109,12 +108,14 @@ public class ChatController {
 
 	public void handlePrivateDouser(ChatMessage chatMessage, SimpMessageHeaderAccessor headerAccessor)
 			throws JsonProcessingException {
-		// 队列没人
-		if (roomUserList.size() == 0) {
+		// 队列没人或者 如果等待组已满，则清空
+		if (roomUserList.size() == 0 || roomUserList.size() == Number_Rooms) {
+			// 等待组清空
+			roomUserList.clear();
 			// 生成房间号给小房间对象
 			room.setRoomOrderNumber((int) (0 + Math.random() * (999 - 0 + 1)));
-
 		}
+
 		// 等待组加入一个人
 		roomUserList.put(chatMessage.getSender(), headerAccessor.getSessionId());
 		// 给每个用户加入房间号
@@ -131,14 +132,6 @@ public class ChatController {
 		Set<String> keys = roomUserList.keySet();
 		for (String v : keys) {
 			simpMessagingTemplate.convertAndSendToUser(v, "/room", chatMessage);
-		}
-		// 如果等待组已满，则给小房间对象加入用户组
-		if (roomUserList.size() == Number_Rooms) {
-			room.setUserGroup(roomUserList);
-
-			// 等待组清空
-			roomUserList.clear();
-
 		}
 
 	}
