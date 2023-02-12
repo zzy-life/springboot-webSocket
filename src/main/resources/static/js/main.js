@@ -30,7 +30,8 @@ function connect(event) {
         chatPage.classList.remove('hidden');
         if (stompClient == null) {
 
-            /* 使用SockJS部署到服务器时，需要走nginx代理才可连接，否则无法连接
+            /* 少数服务器使用SockJS部署到服务器时，需要走nginx代理才可连接，否则无法连接
+            或者可以使用WebSocket
             #websocket配置
             # location /{
             #     proxy_set_header Host $http_host;
@@ -48,9 +49,9 @@ function connect(event) {
             # }
             */
 
-            //var socket = new SockJS('/ws');
-            var host = location.host;
-            var socket = new WebSocket('ws://' + host + '/ws');
+             var socket = new SockJS('/ws');
+           // var host = location.host;
+          //  var socket = new WebSocket('ws://' + host + '/ws');
             stompClient = Stomp.over(socket);
             stompClient.heartbeat.outgoing = 20000; // client will send heartbeats every 20000ms
             stompClient.heartbeat.incoming = 0;     // client does not want to receive heartbeats
